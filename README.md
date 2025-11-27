@@ -37,7 +37,7 @@ Detail arsitektur dijelaskan pada `docs/architecture.md`.
 ## 4. Struktur Repository
 
 ```text
-service-request-app/
+sistem-pelaporan/
 ├── frontend/
 ├── backend/
 ├── terraform/

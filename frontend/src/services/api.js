@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api",
+  baseURL: import.meta.env.VITE_API_BASE_URL || "https://sistem-pelaporan-backend-760131481707.asia-southeast2.run.app/api",
 });
 
 // inject token kalau ada
@@ -14,3 +14,4 @@ api.interceptors.request.use((config) => {
 });
 
 export default api;
+

@@ -22,10 +22,10 @@ const AdminDashboard = () => {
     loadTickets();
   }, []);
 
-  const handleChangeStatus = async (ticketId, newStatus) => {
+  const handleChangeStatus = async (id, status) => {
     try {
-      await api.patch(`/tickets/${ticketId}/status`, { status: newStatus });
-      loadTickets();
+      await api.patch(`/tickets/${id}/status`, { status });
+      await loadTickets();
     } catch (err) {
       console.error(err);
     }

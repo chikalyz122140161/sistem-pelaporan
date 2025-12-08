@@ -24,12 +24,11 @@ const UserDashboard = () => {
     loadTickets();
   }, []);
 
-  const handleCreate = async (formData, resetForm) => {
+  const handleCreate = async (data) => {
     setCreating(true);
     try {
-      await api.post("/tickets", formData);
-      resetForm();
-      loadTickets();
+      await api.post("/tickets", data);
+      await loadTickets();
     } catch (err) {
       console.error(err);
     } finally {
@@ -39,10 +38,11 @@ const UserDashboard = () => {
 
   return (
     <div style={{ maxWidth: 900, margin: "20px auto" }}>
-      <h2>Dashboard User</h2>
+      <h2>Dashboard Pengguna</h2>
+
       <TicketForm onSubmit={handleCreate} loading={creating} />
 
-      <h3>Tiket Saya</h3>
+      <h3>Daftar Tiket Anda</h3>
       {loadingTickets ? (
         <div>Memuat tiket...</div>
       ) : (

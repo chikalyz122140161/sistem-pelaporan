@@ -19,7 +19,7 @@ services:
       dockerfile: Dockerfile
     container_name: silapor-frontend
     environment:
-      - VITE_API_BASE_URL=http://backend:8080/api
+      - VITE_API_BASE_URL=https://sistem-pelaporan-backend-760131481707.asia-southeast2.run.app/api
     ports:
       - "5173:8080"
     depends_on:
@@ -29,9 +29,9 @@ services:
     image: postgres:15-alpine
     container_name: silapor-db
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=yourpassword
-      - POSTGRES_DB=silaporcloud
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Kelompok-7
+      POSTGRES_DB: silaporcloud
     ports:
       - "5432:5432"
     volumes:

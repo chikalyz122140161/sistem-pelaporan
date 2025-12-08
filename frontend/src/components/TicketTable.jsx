@@ -15,38 +15,44 @@ const TicketTable = ({ tickets = [], onChangeStatus, showActions }) => {
         </tr>
       </thead>
       <tbody>
-        {tickets.length === 0 && (
+        {tickets.length === 0 ? (
           <tr>
-            <td colSpan={showActions ? 7 : 6} align="center">
-              Belum ada tiket
+            <td colSpan={showActions ? 7 : 6} style={{ textAlign: "center" }}>
+              Belum ada tiket.
             </td>
           </tr>
-        )}
-
-        {tickets.map((t) => (
-          <tr key={t.id}>
-            <td>{t.id}</td>
-            <td>{t.title}</td>
-            <td>{t.category}</td>
-            <td>{t.priority}</td>
-            <td>{t.status}</td>
-            <td>{new Date(t.created_at).toLocaleString()}</td>
-            {showActions && (
+        ) : (
+          tickets.map((t) => (
+            <tr key={t.id}>
+              <td>{t.id}</td>
+              <td>{t.title}</td>
+              <td>{t.category || "-"}</td>
+              <td>{t.priority || "-"}</td>
+              <td>{t.status}</td>
               <td>
-                <select
-                  value={t.status}
-                  onChange={(e) => onChangeStatus(t.id, e.target.value)}
-                >
-                  {statuses.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
+                {t.created_at
+                  ? new Date(t.created_at).toLocaleString("id-ID")
+                  : "-"}
               </td>
-            )}
-          </tr>
-        ))}
+              {showActions && (
+                <td>
+                  <select
+                    value={t.status}
+                    onChange={(e) =>
+                      onChangeStatus && onChangeStatus(t.id, e.target.value)
+                    }
+                  >
+                    {statuses.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                  </select>
+                </td>
+              )}
+            </tr>
+          ))
+        )}
       </tbody>
     </table>
   );

@@ -11,36 +11,50 @@ const Navbar = () => {
   };
 
   return (
-    <nav style={{ padding: "10px 20px", borderBottom: "1px solid #ddd" }}>
-      <span style={{ fontWeight: "bold", marginRight: 20 }}>SiLaporCloud</span>
-
-      {user && user.role === "USER" && (
-        <Link to="/user/dashboard" style={{ marginRight: 10 }}>
-          Dashboard User
-        </Link>
-      )}
-      {user && user.role === "ADMIN" && (
-        <Link to="/admin/dashboard" style={{ marginRight: 10 }}>
-          Dashboard Admin
-        </Link>
-      )}
-
-      {!user && (
-        <>
-          <Link to="/login" style={{ marginRight: 10 }}>
-            Login
-          </Link>
-          <Link to="/register">Register</Link>
-        </>
-      )}
+    <nav
+      style={{
+        padding: "10px 20px",
+        borderBottom: "1px solid #ddd",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        backgroundColor: "#f8f8f8",
+      }}
+    >
+      <div>
+        <span style={{ fontWeight: "bold", marginRight: 20 }}>
+          SiLaporCloud
+        </span>
+        {user ? (
+          <>
+            {user.role === "USER" && (
+              <Link to="/user" style={{ marginRight: 12 }}>
+                Dashboard User
+              </Link>
+            )}
+            {user.role === "ADMIN" && (
+              <Link to="/admin" style={{ marginRight: 12 }}>
+                Dashboard Admin
+              </Link>
+            )}
+          </>
+        ) : (
+          <>
+            <Link to="/login" style={{ marginRight: 12 }}>
+              Login
+            </Link>
+            <Link to="/register">Register</Link>
+          </>
+        )}
+      </div>
 
       {user && (
-        <span style={{ float: "right" }}>
+        <div>
           <span style={{ marginRight: 10 }}>
             {user.name} ({user.role})
           </span>
           <button onClick={handleLogout}>Logout</button>
-        </span>
+        </div>
       )}
     </nav>
   );

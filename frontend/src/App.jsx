@@ -18,16 +18,16 @@ const App = () => {
         <Route path="/register" element={<Register />} />
 
         <Route
-          path="/user/dashboard"
+          path="/user"
           element={
-            <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
+            <ProtectedRoute allowedRoles={["USER"]}>
               <UserDashboard />
             </ProtectedRoute>
           }
         />
 
         <Route
-          path="/admin/dashboard"
+          path="/admin"
           element={
             <ProtectedRoute allowedRoles={["ADMIN"]}>
               <AdminDashboard />

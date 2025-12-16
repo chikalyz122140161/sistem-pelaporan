@@ -3,10 +3,10 @@ import api from "../services/api";
 import Navbar from "../components/Navbar"
 
 const normalizeStatusClass = (status) =>
-  (status || "").toString().trim().toLowerCase(); // "IN_PROGRESS" -> "in_progress"
+  (status || "").toString().trim().toLowerCase(); // 
 
 const normalizePriorityClass = (priority) =>
-  (priority || "").toString().trim().toLowerCase(); // "HIGH" -> "high"
+  (priority || "").toString().trim().toLowerCase(); // 
 
 const AdminDashboard = () => {
   const [tickets, setTickets] = useState([]);
@@ -37,7 +37,6 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     loadTickets();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const filteredTickets = useMemo(() => {
@@ -65,7 +64,6 @@ const AdminDashboard = () => {
   const handleChangeStatus = async (id, nextStatus) => {
     try {
       await api.patch(`/tickets/${id}/status`, { status: nextStatus });
-      // refresh supaya konsisten dengan backend
       await loadTickets();
     } catch (err) {
       console.error(err);
@@ -81,7 +79,6 @@ const AdminDashboard = () => {
 
     try {
       await api.delete(`/tickets/${id}`);
-      // hapus dari state tanpa reload
       setTickets((prev) => prev.filter((t) => (t.id ?? t.ticket_id) !== id));
     } catch (err) {
       console.error(err);
@@ -225,6 +222,28 @@ h1 { font-size: 28px; font-weight: 700; }
 .btn-delete:hover { background: #fee2e2; border-color: #fca5a5; }
 .btn-delete:active { transform: scale(0.96); }
 .btn-delete:focus { outline: none; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2); }
+
+@media (max-width: 1024px) {
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .filter-bar { grid-template-columns: 1fr 1fr 1fr; }
+}
+
+@media (max-width: 768px) {
+  .stats { grid-template-columns: 1fr; }
+  .filter-bar { grid-template-columns: 1fr; gap: 12px; }
+  .filter-bar input,
+  .filter-bar select { width: 100%; }
+  .stat-card strong { font-size: 22px; }
+  .stat-card span { font-size: 13px; }
+  h1 { font-size: 24px; }
+}
+
+@media (max-width: 480px) {
+  .filter-bar { grid-template-columns: 1fr; }
+  .action-cell { flex-direction: column; gap: 4px; }
+  .btn-delete { width: 100%; }
+  .action-select { width: 100%; }
+}
       `}</style>
 
       <h1>Dashboard Admin</h1>

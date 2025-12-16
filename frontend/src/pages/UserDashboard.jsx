@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import api from "../services/api";
-import Navbar from "../components/Navbar"
+import Navbar from "../components/Navbar";
 import TicketForm from "../components/TicketForm";
 import TicketTable from "../components/TicketTable";
 
@@ -47,7 +47,7 @@ const UserDashboard = () => {
 
   return (
     <>
-    <Navbar/>
+      <Navbar />
       <div className="page">
         <div className="container">
           <header className="header">
@@ -127,28 +127,14 @@ const UserDashboard = () => {
           --error: #dc2626;
         }
 
-        * {
-          box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background: var(--blue-soft); color: var(--text-main); }
 
-        body {
-          margin: 0;
-          font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
-          background: var(--blue-soft);
-          color: var(--text-main);
-        }
+        .page { min-height: 100vh; padding: 80px; }
+        @media (max-width: 768px) { .page { padding: 70px 16px 20px; } }
 
-        .page {
-          min-height: 100vh;
-          padding: 80px;
-        }
+        .container { max-width: 1100px; margin: auto; }
 
-        .container {
-          max-width: 1100px;
-          margin: auto;
-        }
-
-        /* HEADER */
         .header {
           display: flex;
           justify-content: space-between;
@@ -161,122 +147,34 @@ const UserDashboard = () => {
           margin-bottom: 20px;
         }
 
-        .header h1 {
-          margin: 0;
-          font-size: 24px;
-          color: var(--blue-main);
-        }
+        .header h1 { margin: 0; font-size: 24px; color: var(--blue-main); }
+        .header p { margin-top: 6px; font-size: 14px; color: var(--text-muted); max-width: 60ch; line-height: 1.6; }
 
-        .header p {
-          margin-top: 6px;
-          font-size: 14px;
-          color: var(--text-muted);
-          max-width: 60ch;
-          line-height: 1.6;
-        }
+        .header-info { display: flex; align-items: center; gap: 12px; }
+        @media (max-width: 900px) { .header { flex-direction: column; align-items: flex-start; } .header-info { flex-wrap: wrap; } }
 
-        .header-info {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
+        .stat-box { background: var(--blue-soft); border: 1px solid var(--border); padding: 10px 14px; border-radius: 10px; text-align: center; }
+        .stat-box span { display: block; font-size: 12px; color: var(--text-muted); }
+        .stat-box strong { font-size: 18px; color: var(--blue-main); }
 
-        .stat-box {
-          background: var(--blue-soft);
-          border: 1px solid var(--border);
-          padding: 10px 14px;
-          border-radius: 10px;
-          text-align: center;
-        }
+        button { background: var(--blue-main); color: white; border: none; padding: 10px 16px; border-radius: 10px; cursor: pointer; font-weight: 600; }
+        button:hover { background: var(--blue-dark); }
+        button:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        .stat-box span {
-          display: block;
-          font-size: 12px;
-          color: var(--text-muted);
-        }
+        .alerts { margin-bottom: 18px; }
+        .alert { padding: 12px 14px; border-radius: 10px; margin-bottom: 8px; font-size: 14px; }
+        .alert.error { background: #fee2e2; color: var(--error); }
+        .alert.success { background: #e0f2fe; color: var(--blue-main); }
 
-        .stat-box strong {
-          font-size: 18px;
-          color: var(--blue-main);
-        }
+        .grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 18px; }
+        @media (max-width: 900px) { .grid { grid-template-columns: 1fr; gap: 14px; } }
 
-        button {
-          background: var(--blue-main);
-          color: white;
-          border: none;
-          padding: 10px 16px;
-          border-radius: 10px;
-          cursor: pointer;
-          font-weight: 600;
-        }
+        .card { background: white; border-radius: 14px; padding: 18px; border: 1px solid var(--border); }
+        .card h2 { margin-top: 0; font-size: 18px; color: var(--blue-main); }
+        .desc { font-size: 13px; color: var(--text-muted); margin-bottom: 14px; }
 
-        button:hover {
-          background: var(--blue-dark);
-        }
-
-        button:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-
-        /* ALERT */
-        .alerts {
-          margin-bottom: 18px;
-        }
-
-        .alert {
-          padding: 12px 14px;
-          border-radius: 10px;
-          margin-bottom: 8px;
-          font-size: 14px;
-        }
-
-        .alert.error {
-          background: #fee2e2;
-          color: var(--error);
-        }
-
-        .alert.success {
-          background: #e0f2fe;
-          color: var(--blue-main);
-        }
-
-        /* GRID */
-        .grid {
-          display: grid;
-          grid-template-columns: 1fr 1.4fr;
-          gap: 18px;
-        }
-
-        .card {
-          background: white;
-          border-radius: 14px;
-          padding: 18px;
-          border: 1px solid var(--border);
-        }
-
-        .card h2 {
-          margin-top: 0;
-          font-size: 18px;
-          color: var(--blue-main);
-        }
-
-        .desc {
-          font-size: 13px;
-          color: var(--text-muted);
-          margin-bottom: 14px;
-        }
-
-        .disabled {
-          opacity: 0.7;
-          pointer-events: none;
-        }
-
-        .hint {
-          margin-top: 10px;
-          font-size: 12px;
-          color: var(--text-muted);
-        }
+        .disabled { opacity: 0.7; pointer-events: none; }
+        .hint { margin-top: 10px; font-size: 12px; color: var(--text-muted); }
 
         .skeleton div {
           height: 38px;
@@ -285,22 +183,7 @@ const UserDashboard = () => {
           margin-bottom: 10px;
           animation: pulse 1.2s infinite;
         }
-
-        @keyframes pulse {
-          0% { opacity: .5; }
-          50% { opacity: 1; }
-          100% { opacity: .5; }
-        }
-
-        @media (max-width: 900px) {
-          .grid {
-            grid-template-columns: 1fr;
-          }
-          .header {
-            flex-direction: column;
-            align-items: flex-start;
-          }
-        }
+        @keyframes pulse { 0% { opacity: .5; } 50% { opacity: 1; } 100% { opacity: .5; } }
       `}</style>
     </>
   );

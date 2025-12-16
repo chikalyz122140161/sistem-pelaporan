@@ -2,101 +2,117 @@
 
 ## 1. Pendahuluan
 
-Sistem Pelaporan adalah aplikasi web tiga-lapis (three-tier web application) yang digunakan untuk mengelola permintaan layanan dan pengaduan dari pengguna. Aplikasi ini di-deploy di Google Cloud Platform menggunakan layanan berbasis container dan managed database.
+Sistem Pelaporan adalah aplikasi web **three-tier (tiga lapis)** yang digunakan untuk mengelola tiket atau permintaan layanan dari pengguna. Sistem ini diimplementasikan dan di-deploy menggunakan **Google Cloud Platform (GCP)** dengan pendekatan container dan layanan terkelola.
 
-Tujuan utama arsitektur ini adalah:
-- Memisahkan dengan jelas antara **presentation tier**, **application tier**, dan **data tier**.
-- Memanfaatkan layanan terkelola GCP agar deployment dan scaling menjadi lebih sederhana.
-- Menyediakan fondasi yang mudah dikembangkan untuk penambahan fitur di iterasi berikutnya.
+Tujuan utama perancangan arsitektur ini adalah:
+
+- Memisahkan tanggung jawab antara **presentation tier**, **application tier**, dan **data tier**.
+- Memanfaatkan layanan managed GCP untuk mempermudah deployment, scaling, dan pemeliharaan.
+- Meningkatkan keamanan dengan penggunaan **database private IP** dan **Secret Manager**.
+
+---
 
 ## 2. Overview Arsitektur
 
-Secara garis besar, arsitektur sistem terdiri dari:
+Arsitektur Sistem Pelaporan terdiri dari tiga lapisan utama:
 
-- **Presentation Tier**  
-  Aplikasi frontend berbasis React yang di-containerize dan di-deploy sebagai service di Cloud Run. Frontend menangani interaksi pengguna (form tiket, tampilan daftar tiket, dan dashboard admin).
+### 2.1 Presentation Tier (Frontend)
 
-- **Application Tier**  
-  Backend API berbasis Node.js + Express yang juga di-deploy di Cloud Run. Layer ini mengimplementasikan logika bisnis, validasi data, autentikasi, dan komunikasi dengan database serta cache.
+Frontend dibangun menggunakan **React (Vite)** dan di-build menjadi aset statis (`dist`). Aplikasi frontend dikemas dalam container dan di-deploy sebagai service pada **Cloud Run**. Frontend bertugas menampilkan antarmuka pengguna seperti form pengajuan tiket, daftar tiket, dan dashboard admin, serta berkomunikasi dengan backend melalui HTTPS.
 
-- **Data Tier**  
-  Cloud SQL for PostgreSQL sebagai database relasional utama untuk menyimpan data pengguna dan tiket. Untuk optimasi performa, disediakan opsi in-memory cache menggunakan Memorystore for Redis.
+### 2.2 Application Tier (Backend API)
 
-Ketiga tier tersebut berjalan di dalam satu Google Cloud project dan dihubungkan melalui VPC Network.
+Backend dikembangkan menggunakan **Node.js + Express** dan di-deploy sebagai service pada **Cloud Run**. Backend berfungsi sebagai REST API yang menangani autentikasi, autorisasi, validasi data, serta operasi CRUD tiket. Backend bersifat stateless dan dapat diskalakan otomatis.
+
+### 2.3 Data Tier (Database)
+
+Data persisten disimpan pada **Cloud SQL for PostgreSQL**. Database dikonfigurasi menggunakan **private IP**, sehingga tidak dapat diakses langsung dari internet publik. Akses database hanya diperbolehkan dari backend melalui jaringan privat.
+
+---
 
 ## 3. Komponen Google Cloud yang Digunakan
 
-1. **Cloud Run (Frontend)**  
-   - Menjalankan container aplikasi React yang sudah di-build.
-   - Mengekspos endpoint HTTPS publik yang diakses oleh browser pengguna.
-   - Mendapatkan konfigurasi ENV seperti base URL API.
+1. **Cloud Run (Frontend)**
 
-2. **Cloud Run (API Layer)**  
-   - Menjalankan backend Node.js + Express.
+   - Menjalankan container aplikasi React hasil build.
+   - Mengekspos endpoint HTTPS publik.
+   - Menggunakan variabel lingkungan `VITE_API_BASE_URL` untuk menentukan alamat backend API.
+
+2. **Cloud Run (Backend API)**
+
+   - Menjalankan aplikasi Node.js + Express.
    - Menyediakan endpoint REST seperti `/api/auth` dan `/api/tickets`.
-   - Terhubung ke Cloud SQL dan Memorystore melalui Serverless VPC Access.
-   - Dapat diskalakan otomatis berdasarkan jumlah request.
+   - Terhubung ke resource privat menggunakan **Serverless VPC Access**.
+   - Menggunakan konfigurasi egress `private-ranges-only` untuk membatasi lalu lintas keluar.
 
-3. **Cloud SQL for PostgreSQL**  
-   - Menyimpan data persisten: `users`, `tickets`, dan tabel lain yang dibutuhkan.
-   - Diletakkan di private VPC dan hanya dapat diakses melalui koneksi terautentikasi dari Cloud Run API Layer.
+3. **Cloud SQL for PostgreSQL (Private IP)**
 
-4. **Memorystore for Redis (opsional)**  
-   - Digunakan sebagai cache untuk data yang sering diakses (misalnya daftar tiket).
-   - Membantu mengurangi beban query langsung ke database.
+   - Menyimpan data utama seperti `users`, `tickets`, dan tabel pendukung lainnya.
+   - Menggunakan private IP sehingga tidak terekspos ke publik.
+   - Diakses oleh backend melalui jaringan VPC.
 
-5. **VPC Network & Serverless VPC Access**  
-   - Menghubungkan Cloud Run (API) ke resource privat seperti Cloud SQL dan Memorystore.
-   - Menjaga agar koneksi database tidak diekspos ke internet publik.
+4. **VPC Network & Private Service Access (PSA)**
 
-6. **Artifact Registry**  
+   - VPC digunakan sebagai jaringan privat untuk resource internal.
+   - PSA digunakan untuk mengaktifkan Cloud SQL private IP di dalam VPC.
+
+5. **Serverless VPC Access Connector**
+
+   - Menghubungkan Cloud Run backend (serverless) ke resource privat di VPC seperti Cloud SQL.
+   - Memastikan koneksi database tidak melalui internet publik.
+
+6. **Artifact Registry**
+
    - Menyimpan Docker image untuk frontend dan backend.
-   - Menjadi source image ketika melakukan deploy ke Cloud Run.
+   - Menjadi sumber image saat deployment ke Cloud Run.
 
-7. **Cloud Build (opsional untuk CI/CD)**  
-   - Mengotomatisasi proses build dan push Docker image ke Artifact Registry.
-   - Dapat di-trigger otomatis dari GitHub ketika ada push ke branch tertentu.
+7. **Terraform (Infrastructure as Code)**
 
-8. **Terraform (Infrastructure as Code)**  
-   - Mendefinisikan resource GCP (Cloud Run, Cloud SQL, VPC, dsb) dalam file konfigurasi.
-   - Mempermudah provisioning dan pengelolaan infrastruktur secara terotomasi dan terdokumentasi.
+   - Digunakan untuk mendefinisikan dan mengelola resource GCP seperti Cloud Run, Cloud SQL, VPC, VPC Connector, IAM, dan Secret Manager.
+   - Memastikan provisioning infrastruktur konsisten dan terdokumentasi.
 
-9. **Secret Manager**  
-   - Menyimpan nilai sensitif seperti database password, JWT secret, atau API key.
-   - Diakses oleh Cloud Run service melalui environment variables yang terhubung ke Secret Manager.
+8. **Secret Manager**
+   - Menyimpan data sensitif seperti `DB_PASSWORD` dan `JWT_SECRET`.
+   - Secret di-inject ke Cloud Run backend menggunakan **secret environment variables (`secretKeyRef`)**, sehingga tidak disimpan sebagai plaintext.
+
+---
 
 ## 4. Alur Request (Request Flow)
 
-1. **Client Request**  
-   Pengguna mengakses URL Cloud Run Frontend melalui browser. Browser mengirimkan HTTP request ke service frontend.
+1. **Akses Frontend**  
+   Pengguna mengakses URL Cloud Run Frontend melalui browser. Cloud Run mengirimkan file HTML, CSS, dan JavaScript ke client.
 
-2. **Frontend Service**  
-   Cloud Run frontend merespons request dengan mengirimkan file HTML, CSS, dan JavaScript yang merender tampilan aplikasi di sisi client.
+2. **Pemanggilan Backend API**  
+   Frontend mengirim request HTTPS ke backend API melalui endpoint `/api/...` untuk proses login, pengambilan data tiket, atau pengelolaan tiket.
 
-3. **API Layer**  
-   Ketika pengguna mengirim data (misalnya membuat tiket baru atau mengambil daftar tiket), frontend mengirimkan request ke Backend API yang berjalan di Cloud Run (API Layer) melalui endpoint `/api/...`.
+3. **Proses di Backend**  
+   Backend memverifikasi token JWT untuk endpoint yang memerlukan autentikasi. Untuk endpoint admin, backend menerapkan middleware autorisasi (misalnya `isAdmin`).
 
-4. **Cache Check (Memorystore)**  
-   Untuk data tertentu yang sering diakses, API Layer terlebih dahulu memeriksa cache di Memorystore for Redis. Jika data tersedia di cache, API mengembalikan respons dari cache tanpa mengakses database.
+4. **Akses Database Privat**  
+   Backend melakukan query ke Cloud SQL PostgreSQL melalui **private IP** menggunakan Serverless VPC Access Connector. Karena egress diset ke `private-ranges-only`, koneksi database tidak keluar ke internet publik.
 
-5. **Database Query (Cloud SQL)**  
-   Jika data tidak tersedia di cache atau operasi membutuhkan perubahan data (insert/update), API Layer mengirim query ke Cloud SQL melalui koneksi private di VPC. Setelah operasi database berhasil, API mengembalikan respons ke frontend dan dapat memperbarui cache jika diperlukan.
+5. **Response ke Client**  
+   Backend mengembalikan response JSON ke frontend. Frontend memperbarui state aplikasi dan menampilkan hasilnya ke pengguna.
 
-6. **Response ke Client**  
-   Frontend menerima respons dari API, memperbarui state aplikasi (misalnya daftar tiket), dan menampilkan hasilnya kepada pengguna.
+---
 
 ## 5. Keamanan dan Akses
 
-- Akses ke Cloud Run API dikontrol melalui konfigurasi IAM dan (opsional) JWT / Identity Platform.
-- Cloud SQL tidak diekspos ke publik; hanya dapat diakses melalui koneksi dari Cloud Run API yang menggunakan Serverless VPC Access dan kredensial yang disimpan di Secret Manager.
-- Komunikasi antar komponen menggunakan HTTPS/TLS.
+- Data sensitif tidak disimpan dalam kode atau environment variable biasa, melainkan di **Secret Manager**.
+- Cloud SQL menggunakan **private IP**, sehingga tidak dapat diakses langsung dari internet.
+- Backend Cloud Run mengakses database melalui VPC dengan koneksi privat.
+- Endpoint backend dilindungi menggunakan **JWT-based authentication** dan kontrol role (admin/non-admin).
+
+---
 
 ## 6. Skalabilitas dan Ketersediaan
 
-- Cloud Run secara otomatis melakukan scaling berdasarkan jumlah request yang masuk.  
-- Cloud SQL dapat diskalakan secara vertikal (upgrade machine type) maupun horizontal (read replica, jika dibutuhkan).  
-- Dengan pendekatan stateless pada Cloud Run dan penyimpanan state di database, aplikasi relatif mudah diskalakan.
+- **Cloud Run** melakukan autoscaling berdasarkan jumlah request dan bersifat stateless.
+- **Cloud SQL** dapat diskalakan secara vertikal dengan upgrade tier, serta mendukung strategi lanjutan seperti read replica jika dibutuhkan.
+- Pemisahan frontend dan backend memungkinkan scaling masing-masing komponen secara independen.
+
+---
 
 ## 7. Kesimpulan
 
-Arsitektur three-tier yang diimplementasikan pada Service Request Platform memisahkan tanggung jawab setiap layer dengan jelas, memanfaatkan layanan managed pada Google Cloud Platform, dan memudahkan proses deployment, pemeliharaan, dan pengembangan fitur di iterasi berikutnya.
+Arsitektur three-tier pada Sistem Pelaporan memisahkan antarmuka pengguna, logika aplikasi, dan penyimpanan data secara jelas. Dengan memanfaatkan Cloud Run, Cloud SQL private IP, Serverless VPC Access, dan Secret Manager, sistem menjadi lebih aman, skalabel, dan mudah dikelola serta siap dikembangkan pada iterasi berikutnya.

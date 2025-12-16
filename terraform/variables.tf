@@ -50,3 +50,9 @@ variable "artifact_repo" {
   type        = string
   default     = "silaporcloud"
 }
+
+variable "db_instance_name_private" {
+  description = "Nama instance Cloud SQL PostgreSQL (private IP)"
+  type        = string
+  default     = "silaporcloud-postgres-private"
+}

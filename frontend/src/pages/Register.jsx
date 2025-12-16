@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import toa from "../assets/toa.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -26,190 +27,197 @@ const Register = () => {
     }
 
     setSuccessMsg("Registrasi berhasil. Silakan login.");
-    // Sedikit jeda sebelum pindah ke halaman login, kalau mau
-    setTimeout(() => {
-      navigate("/login");
-    }, 1000);
+    setTimeout(() => navigate("/login"), 1000);
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "#f5f5f5",
-        padding: 16,
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: 460,
-          backgroundColor: "#ffffff",
-          borderRadius: 8,
-          padding: 24,
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-        }}
-      >
-        <h2
-          style={{
-            marginBottom: 8,
-            textAlign: "center",
-          }}
-        >
-          Daftar Akun SiLaporCloud
-        </h2>
-        <p
-          style={{
-            marginBottom: 24,
-            textAlign: "center",
-            fontSize: 14,
-            color: "#666",
-          }}
-        >
-          Buat akun baru untuk mengirim dan memantau tiket pelaporan Anda.
-        </p>
+    <div style={styles.wrapper}>
+      <div style={styles.container}>
+        <div style={styles.card}>
+          <h2 style={styles.title}>Daftar SiLaporCloud</h2>
+          <p style={styles.subtitle}>
+            Buat akun baru untuk mengelola tiket pelaporan
+          </p>
 
-        {errorMsg && (
-          <div
-            style={{
-              marginBottom: 16,
-              padding: 10,
-              borderRadius: 6,
-              backgroundColor: "#ffe5e5",
-              color: "#b00020",
-              fontSize: 14,
-            }}
-          >
-            {errorMsg}
-          </div>
-        )}
+          {errorMsg && <div style={styles.error}>{errorMsg}</div>}
+          {successMsg && <div style={styles.success}>{successMsg}</div>}
 
-        {successMsg && (
-          <div
-            style={{
-              marginBottom: 16,
-              padding: 10,
-              borderRadius: 6,
-              backgroundColor: "#e6f4ea",
-              color: "#1b5e20",
-              fontSize: 14,
-            }}
-          >
-            {successMsg}
-          </div>
-        )}
+          <form onSubmit={handleSubmit}>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Nama Lengkap</label>
+              <input
+                type="text"
+                placeholder="Nama Anda"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                style={styles.input}
+              />
+            </div>
 
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: 16 }}>
-            <label
-              htmlFor="name"
-              style={{ display: "block", marginBottom: 4, fontSize: 14 }}
-            >
-              Nama Lengkap
-            </label>
-            <input
-              id="name"
-              type="text"
-              placeholder="Nama Anda"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Email</label>
+              <input
+                type="email"
+                placeholder="nama@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                style={styles.input}
+              />
+            </div>
+
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Password</label>
+              <input
+                type="password"
+                placeholder="Minimal 6 karakter"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+                style={styles.input}
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
               style={{
-                width: "100%",
-                padding: "8px 10px",
-                borderRadius: 6,
-                border: "1px solid #ccc",
-                fontSize: 14,
+                ...styles.button,
+                backgroundColor: loading ? "#0f4c81" : "#0f4c81",
               }}
-            />
-          </div>
-
-          <div style={{ marginBottom: 16 }}>
-            <label
-              htmlFor="email"
-              style={{ display: "block", marginBottom: 4, fontSize: 14 }}
             >
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              placeholder="nama@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              style={{
-                width: "100%",
-                padding: "8px 10px",
-                borderRadius: 6,
-                border: "1px solid #ccc",
-                fontSize: 14,
-              }}
-            />
-          </div>
+              {loading ? "Memproses..." : "Daftar"}
+            </button>
+          </form>
 
-          <div style={{ marginBottom: 20 }}>
-            <label
-              htmlFor="password"
-              style={{ display: "block", marginBottom: 4, fontSize: 14 }}
-            >
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              placeholder="Minimal 6 karakter"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-              style={{
-                width: "100%",
-                padding: "8px 10px",
-                borderRadius: 6,
-                border: "1px solid #ccc",
-                fontSize: 14,
-              }}
-            />
-          </div>
+          <p style={styles.footerText}>
+            Sudah punya akun?{" "}
+            <Link to="/login" style={styles.link}>
+              Masuk disini
+            </Link>
+          </p>
+        </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              width: "100%",
-              padding: "10px 12px",
-              border: "none",
-              borderRadius: 6,
-              backgroundColor: loading ? "#999" : "#388e3c",
-              color: "#fff",
-              fontWeight: 600,
-              cursor: loading ? "default" : "pointer",
-              marginBottom: 12,
-            }}
-          >
-            {loading ? "Memproses..." : "Daftar"}
-          </button>
-        </form>
-
-        <p
-          style={{
-            fontSize: 14,
-            textAlign: "center",
-            marginTop: 8,
-          }}
-        >
-          Sudah punya akun?{" "}
-          <Link to="/login" style={{ color: "#1976d2" }}>
-            Masuk di sini
-          </Link>
-        </p>
+        {/* RIGHT - IMAGE */}
+        <div style={styles.imageWrapper}>
+          <img src={toa} alt="Ilustrasi Pengumuman" style={styles.image} />
+        </div>
       </div>
     </div>
   );
+};
+
+const styles = {
+  wrapper: {
+    minHeight: "100vh",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    background: "linear-gradient(135deg, #e0f2fe, #e0f2fe)",
+    padding: 16,
+  },
+
+  container: {
+    display: "flex",
+    width: "100%",
+    maxWidth: 900,
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    overflow: "hidden",
+    boxShadow: "0 16px 40px rgba(0,0,0,0.2)",
+  },
+
+  card: {
+    flex: 1,
+    padding: 40,
+  },
+
+  imageWrapper: {
+    flex: 1,
+    backgroundColor: "#1976d2",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  image: {
+    width: "70%",
+    maxWidth: 280,
+  },
+
+  title: {
+    textAlign: "center",
+    marginBottom: 4,
+  },
+
+  subtitle: {
+    textAlign: "center",
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 24,
+  },
+
+  error: {
+    marginBottom: 16,
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: "#fdecea",
+    color: "#b71c1c",
+    fontSize: 14,
+  },
+
+  success: {
+    marginBottom: 16,
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: "#e6f4ea",
+    color: "#1b5e20",
+    fontSize: 14,
+  },
+
+  formGroup: {
+    marginBottom: 16,
+  },
+
+  label: {
+    display: "block",
+    marginBottom: 6,
+    fontSize: 14,
+    fontWeight: 500,
+  },
+
+  input: {
+    width: "100%",
+    padding: "10px 12px",
+    borderRadius: 8,
+    border: "1px solid #ccc",
+    fontSize: 14,
+  },
+
+  button: {
+    width: "100%",
+    padding: 12,
+    border: "none",
+    borderRadius: 8,
+    color: "#fff",
+    fontWeight: 600,
+    cursor: "pointer",
+    marginTop: 8,
+  },
+
+  footerText: {
+    marginTop: 20,
+    fontSize: 14,
+    textAlign: "center",
+  },
+
+  link: {
+    color: "#1976d2",
+    fontWeight: 500,
+    textDecoration: "none",
+  },
 };
 
 export default Register;

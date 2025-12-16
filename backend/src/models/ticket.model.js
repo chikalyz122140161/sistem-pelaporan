@@ -54,3 +54,11 @@ export const updateTicketStatus = async (ticket_id, status) => {
   const result = await pool.query(query, [status, ticket_id]);
   return result.rows[0];
 };
+
+export const deleteTicketById = async (id) => {
+  const result = await pool.query(
+    "DELETE FROM tickets WHERE id = $1 RETURNING id",
+    [id]
+  );
+  return result.rows[0] || null; 
+};

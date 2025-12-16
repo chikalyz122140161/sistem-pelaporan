@@ -1,7 +1,15 @@
 import axios from "axios";
 
+const baseURL = import.meta.env.VITE_API_BASE_URL;
+
+if (!baseURL) {
+  throw new Error(
+    "VITE_API_BASE_URL is not set. Create frontend/.env (local) or set it in your deployment environment."
+  );
+}
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "https://sistem-pelaporan-backend-760131481707.asia-southeast2.run.app/api",
+  baseURL,
 });
 
 // inject token kalau ada
@@ -14,4 +22,3 @@ api.interceptors.request.use((config) => {
 });
 
 export default api;
-

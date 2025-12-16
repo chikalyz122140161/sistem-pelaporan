@@ -19,7 +19,6 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     allowedRoles.length > 0 &&
     !allowedRoles.includes(user.role)
   ) {
-    // Kalau role tidak diizinkan, kembalikan ke halaman login atau root
     return <Navigate to="/login" replace />;
   }
 

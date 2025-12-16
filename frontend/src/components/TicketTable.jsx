@@ -9,6 +9,7 @@ const TicketTable = ({ tickets = [], onChangeStatus, showActions }) => {
           <th>Judul</th>
           <th>Kategori</th>
           <th>Prioritas</th>
+          <th>Deskripsi</th>
           <th>Status</th>
           <th>Dibuat</th>
           {showActions && <th>Aksi</th>}
@@ -28,6 +29,7 @@ const TicketTable = ({ tickets = [], onChangeStatus, showActions }) => {
               <td>{t.title}</td>
               <td>{t.category || "-"}</td>
               <td>{t.priority || "-"}</td>
+              <td>{t.description || "-"}</td>
               <td>{t.status}</td>
               <td>
                 {t.created_at

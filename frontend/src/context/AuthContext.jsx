@@ -4,28 +4,27 @@ import api from "../services/api";
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    try {
-      const stored = localStorage.getItem("silapor_user");
-      return stored ? JSON.parse(stored) : null;
-    } catch {
-      return null;
-    }
-  });
-
-  const [token, setToken] = useState(() => {
-    try {
-      return localStorage.getItem("token") || null;
-    } catch {
-      return null;
-    }
-  });
-
-  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Disiapkan jika perlu sinkronisasi tambahan, tapi tidak wajib diisi
-  }, [token, user]);
+    const storedUser = localStorage.getItem("silapor_user");
+    const storedToken = localStorage.getItem("token");
+
+    if (storedUser && storedToken) {
+      try {
+        setUser(JSON.parse(storedUser));
+        setToken(storedToken);
+      } catch {
+        localStorage.clear();
+        setUser(null);
+        setToken(null);
+      }
+    }
+
+    setLoading(false);
+  }, []);
 
   const login = async (email, password) => {
     setLoading(true);
@@ -39,12 +38,14 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("silapor_user", JSON.stringify(userData));
       localStorage.setItem("token", jwtToken);
 
-      return { success: true };
+      return { success: true, user: userData };
     } catch (error) {
-      const message =
-        error?.response?.data?.message ||
-        "Login gagal. Periksa email dan password Anda.";
-      return { success: false, message };
+      return {
+        success: false,
+        message:
+          error?.response?.data?.message ||
+          "Login gagal. Periksa email dan password.",
+      };
     } finally {
       setLoading(false);
     }
@@ -61,10 +62,12 @@ export const AuthProvider = ({ children }) => {
 
       return { success: true, data: res.data };
     } catch (error) {
-      const message =
-        error?.response?.data?.message ||
-        "Registrasi gagal. Silakan coba lagi.";
-      return { success: false, message };
+      return {
+        success: false,
+        message:
+          error?.response?.data?.message ||
+          "Registrasi gagal. Silakan coba lagi.",
+      };
     } finally {
       setLoading(false);
     }

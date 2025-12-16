@@ -3,6 +3,7 @@ import {
   getTicketsByUser,
   getAllTickets,
   updateTicketStatus,
+  deleteTicketById,
 } from "../models/ticket.model.js";
 
 const VALID_STATUSES = ["OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"];
@@ -71,6 +72,22 @@ export const changeStatus = async (req, res) => {
     return res.json(updated);
   } catch (err) {
     console.error("Change status error:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const deleteTicket = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deleted = await deleteTicketById(id);
+    if (!deleted) {
+      return res.status(404).json({ message: "Ticket not found" });
+    }
+
+    return res.json({ message: "Ticket deleted", id: deleted.id });
+  } catch (err) {
+    console.error("Delete ticket error:", err);
     return res.status(500).json({ message: "Internal server error" });
   }
 };

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import toa from "../assets/toa.png";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -18,153 +19,174 @@ const Login = () => {
     setErrorMsg("");
 
     const result = await login(email, password);
-
     if (!result.success) {
       setErrorMsg(result.message);
       return;
     }
 
-    navigate(from, { replace: true });
+    if (result.user.role === "ADMIN") {
+      navigate("/admin", { replace: true });
+    } else {
+      navigate("/user", { replace: true });
+    }
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "#f5f5f5",
-        padding: 16,
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: 420,
-          backgroundColor: "#ffffff",
-          borderRadius: 8,
-          padding: 24,
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-        }}
-      >
-        <h2
-          style={{
-            marginBottom: 8,
-            textAlign: "center",
-          }}
-        >
-          Masuk ke SiLaporCloud
-        </h2>
-        <p
-          style={{
-            marginBottom: 24,
-            textAlign: "center",
-            fontSize: 14,
-            color: "#666",
-          }}
-        >
-          Gunakan akun yang sudah terdaftar untuk mengelola tiket pelaporan.
-        </p>
+    <div style={styles.wrapper}>
+      <div style={styles.container}>
+        <div style={styles.card}>
+          <h2 style={styles.title}>SiLaporCloud</h2>
+          <p style={styles.subtitle}>Masuk untuk mengelola tiket pelaporan</p>
 
-        {errorMsg && (
-          <div
-            style={{
-              marginBottom: 16,
-              padding: 10,
-              borderRadius: 6,
-              backgroundColor: "#ffe5e5",
-              color: "#b00020",
-              fontSize: 14,
-            }}
-          >
-            {errorMsg}
-          </div>
-        )}
+          {errorMsg && <div style={styles.error}>{errorMsg}</div>}
 
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: 16 }}>
-            <label
-              htmlFor="email"
-              style={{ display: "block", marginBottom: 4, fontSize: 14 }}
-            >
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              placeholder="nama@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
+          <form onSubmit={handleSubmit}>
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Email</label>
+              <input
+                type="email"
+                placeholder="nama@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                style={styles.input}
+              />
+            </div>
+
+            <div style={styles.formGroup}>
+              <label style={styles.label}>Password</label>
+              <input
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                style={styles.input}
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
               style={{
-                width: "100%",
-                padding: "8px 10px",
-                borderRadius: 6,
-                border: "1px solid #ccc",
-                fontSize: 14,
+                ...styles.button,
+                backgroundColor: loading ? "#0f4c81" : "#0f4c81",
               }}
-            />
-          </div>
-
-          <div style={{ marginBottom: 20 }}>
-            <label
-              htmlFor="password"
-              style={{ display: "block", marginBottom: 4, fontSize: 14 }}
             >
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              style={{
-                width: "100%",
-                padding: "8px 10px",
-                borderRadius: 6,
-                border: "1px solid #ccc",
-                fontSize: 14,
-              }}
-            />
-          </div>
+              {loading ? "Memproses..." : "Masuk"}
+            </button>
+          </form>
 
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              width: "100%",
-              padding: "10px 12px",
-              border: "none",
-              borderRadius: 6,
-              backgroundColor: loading ? "#999" : "#1976d2",
-              color: "#fff",
-              fontWeight: 600,
-              cursor: loading ? "default" : "pointer",
-              marginBottom: 12,
-            }}
-          >
-            {loading ? "Memproses..." : "Masuk"}
-          </button>
-        </form>
+          <p style={styles.footerText}>
+            Belum punya akun?{" "}
+            <Link to="/register" style={styles.link}>
+              Daftar disini
+            </Link>
+          </p>
+        </div>
 
-        <p
-          style={{
-            fontSize: 14,
-            textAlign: "center",
-            marginTop: 8,
-          }}
-        >
-          Belum punya akun?{" "}
-          <Link to="/register" style={{ color: "#1976d2" }}>
-            Daftar di sini
-          </Link>
-        </p>
+        <div style={styles.imageWrapper}>
+          <img src={toa} alt="Ilustrasi Pengumuman" style={styles.image} />
+        </div>
       </div>
     </div>
   );
+};
+
+const styles = {
+  wrapper: {
+    minHeight: "100vh",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    background: "linear-gradient(135deg, #e0f2fe, #e0f2fe)",
+    padding: 16,
+  },
+
+  container: {
+    display: "flex",
+    width: "100%",
+    maxWidth: 900,
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    overflow: "hidden",
+    boxShadow: "0 16px 40px rgba(0,0,0,0.2)",
+  },
+
+  card: {
+    flex: 1,
+    padding: 40,
+  },
+
+  imageWrapper: {
+    flex: 1,
+    background: "linear-gradient(135deg, #1976d2, #1976d2)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  image: {
+    width: "70%",
+    maxWidth: 280,
+  },
+
+  title: {
+    textAlign: "center",
+    marginBottom: 4,
+  },
+
+  subtitle: {
+    textAlign: "center",
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 24,
+  },
+
+  error: {
+    marginBottom: 16,
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: "#fdecea",
+    color: "#b71c1c",
+    fontSize: 14,
+  },
+
+  formGroup: {
+    marginBottom: 16,
+  },
+
+  label: {
+    display: "block",
+    marginBottom: 6,
+    fontSize: 14,
+    fontWeight: 500,
+  },
+
+  input: {
+    width: "100%",
+    padding: "10px 12px",
+    borderRadius: 8,
+    border: "1px solid #ccc",
+    fontSize: 14,
+  },
+
+  button: {
+    width: "100%",
+    padding: 12,
+    border: "none",
+    borderRadius: 8,
+    color: "#fff",
+    fontWeight: 600,
+    cursor: "pointer",
+    marginTop: 8,
+  },
+
+  footerText: {
+    marginTop: 20,
+    fontSize: 14,
+    textAlign: "center",
+  },
 };
 
 export default Login;

@@ -261,6 +261,11 @@ resource "google_cloud_run_service" "backend" {
 
         env {
           name  = "DB_USER"
+          value = var.db_name
+        }
+
+        env {
+          name  = "DB_NAME"
           value = google_sql_user.postgres_private.name
         }
 
